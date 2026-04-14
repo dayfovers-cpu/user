@@ -283,17 +283,17 @@ form.addEventListener('submit', function(e) {
 
     showLoading();
 
-    // --- LOGIC SIMULASI UNTUK TES ---
-    // Kita gunakan setTimeout untuk simulasi loading server selama 1.5 detik
+    // Simulasi loading selama 1.5 detik
     setTimeout(() => {
         let data;
 
+        // PERBAIKAN: Menambahkan tanda kutip dan koma yang hilang
         if (noPendaftaran === 'SMPKF00001') {
             data = {
                 status: 'lolos',
                 nama: 'Farel',
-                prodi: 'siswa baru',
-                universitas: 'Smp Kembangan',
+                prodi: 'Siswa Baru',
+                universitas: 'SMP Kembangan',
                 nilai: '88.5',
                 tanggal: '15 April 2026'
             };
@@ -301,16 +301,16 @@ form.addEventListener('submit', function(e) {
         else if (noPendaftaran === 'SMPKB00002') {
             data = {
                 status: 'tidak-lolos',
-                nama: Bustomi,
-                prodi: 'siswa baru',
-                universitas: 'Smp Kembangan',
+                nama: 'Bustomi', // Tadi tidak ada tanda kutip
+                prodi: 'Siswa Baru',
+                universitas: 'SMP Kembangan',
                 nilai: '60.0'
             };
         } 
         else if (noPendaftaran === 'SMPKR00003') {
             data = {
                 status: 'pending',
-                nama: 'Rifki'
+                nama: 'Rifki', // Tadi kurang tanda koma di sini
                 pesan: 'Berkas Anda sedang dalam tahap verifikasi oleh tim seleksi.'
             };
         }
@@ -330,7 +330,7 @@ cekLagiBtn.addEventListener('click', resetForm);
 function showLoading() {
     cekCard.style.display = 'none';
     resultContainer.style.display = 'block';
-    resultContainer.className = 'form-container status-result'; // Reset class
+    resultContainer.className = 'form-container status-result'; 
     statusIcon.innerHTML = '';
     statusTitle.textContent = 'Memeriksa Database...';
     statusDetail.textContent = 'Mohon tunggu sebentar';
@@ -342,6 +342,9 @@ function showResult(data) {
     spinner.style.display = 'none';
     cekLagiBtn.style.display = 'block';
     
+    // Reset border jika sebelumnya ada border kuning dari status pending
+    resultContainer.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+
     if (data.status === 'lolos') {
         resultContainer.className = 'form-container status-result status-lolos';
         statusIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #22c55e;"></i>';
@@ -362,10 +365,10 @@ function showResult(data) {
         `;
     } else if (data.status === 'pending') {
         resultContainer.className = 'form-container status-result';
-        resultContainer.style.border = '2px solid #ffc107'; // Warna kuning untuk pending
+        resultContainer.style.border = '2px solid #ffc107'; 
         statusIcon.innerHTML = '<i class="fas fa-clock" style="color: #ffc107;"></i>';
         statusTitle.textContent = 'STATUS: PENDING';
-        statusDetail.textContent = data.pesan;
+        statusDetail.innerHTML = `<strong>${data.nama}</strong><br>${data.pesan}`;
     } else {
         resultContainer.className = 'form-container status-result';
         statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #ccc;"></i>';
@@ -377,7 +380,6 @@ function showResult(data) {
 function resetForm() {
     resultContainer.style.display = 'none';
     cekCard.style.display = 'block';
-    resultContainer.style.border = 'none';
     noPendaftaranInput.value = '';
     namaInput.value = '';
     noPendaftaranInput.focus();
