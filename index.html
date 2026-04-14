@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPMB 2024 - Cek Status Penerimaan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* BACKGROUND SLIDESHOW (Dari style.css Anda) */
+        .background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideShow 20s infinite;
+        }
+
+        /* Menggunakan placeholder gambar jika file lokal m1.jpg dsb belum ada */
+        .slide:nth-child(1) { background-image: url("m1.jpg"); animation-delay: 0s; }
+        .slide:nth-child(2) { background-image: url("m2.jpg"); animation-delay: 5s; }
+        .slide:nth-child(3) { background-image: url("m3.jpg"); animation-delay: 10s; }
+        .slide:nth-child(4) { background-image: url("img/foto4.jpg"); animation-delay: 15s; }
+
+        @keyframes slideShow {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            40% { opacity: 1; transform: scale(1.05); }
+            60% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* OVERLAY GELAP */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* NAVBAR (Gaya Modern Glassmorphism) */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #a855f7;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #a855f7;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            padding-top: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* FORM CONTAINER (Glassmorphism dari style.css) */
+        .form-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .form-container h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        /* INPUT STYLE */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: block;
+            color: #d1d5ff;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* TOMBOL GRADASI */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #6a00ff, #a855f7);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.4);
+        }
+
+        /* STATUS RESULT STYLES */
+        .status-result {
+            display: none;
+        }
+
+        .status-lolos { border: 2px solid #22c55e; background: rgba(34, 197, 94, 0.2); }
+        .status-tidak-lolos { border: 2px solid #ef4444; background: rgba(239, 68, 68, 0.2); }
+        
+        .status-icon { font-size: 3rem; margin-bottom: 15px; }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #a855f7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; }
+            .form-container { margin: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background">
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <div class="dot"></div>
+            SPMB 2024
+        </a>
+    </nav>
+
+    <main class="main-content">
+        <div class="form-container" id="cekCard">
+            <i class="fas fa-search" style="font-size: 40px; color: #a855f7; margin-bottom: 15px;"></i>
+            <h2>Cek Kelulusan</h2>
+            <span class="sub-text">Silakan masukkan data pendaftaran Anda</span>
+            
+            <form id="cekForm">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Nomor Pendaftaran</label>
+                    <input type="text" id="noPendaftaran" placeholder="SPMB0012345678" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nama Lengkap</label>
+                    <input type="text" id="namaSiswa" placeholder="Sesuai kartu pendaftaran" required>
+                </div>
+
+                <button type="submit" class="btn">
+                    <i class="fas fa-check-circle"></i> LIHAT HASIL
+                </button>
+            </form>
+        </div>
+
+        <div class="form-container status-result" id="resultContainer">
+            <div class="spinner" id="spinner"></div>
+            <div class="status-icon" id="statusIcon"></div>
+            <h2 id="statusTitle"></h2>
+            <p id="statusDetail" style="line-height: 1.6; margin-bottom: 20px;"></p>
+            <button class="btn" id="cekLagiBtn" style="display: none; background: rgba(255,255,255,0.2);">
+                <i class="fas fa-redo"></i> Kembali
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('cekForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const cekCard = document.getElementById('cekCard');
+        const noPendaftaranInput = document.getElementById('noPendaftaran');
+        const namaInput = document.getElementById('namaSiswa');
+
+        const spinner = document.getElementById('spinner');
+        const statusIcon = document.getElementById('statusIcon');
+        const statusTitle = document.getElementById('statusTitle');
+        const statusDetail = document.getElementById('statusDetail');
+        const cekLagiBtn = document.getElementById('cekLagiBtn');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const noPendaftaran = noPendaftaranInput.value.trim().toUpperCase();
+            const nama = namaInput.value.trim();
+
+            showLoading();
+
+            // Simulasi fetch ke cek.php
+            fetch('cek.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'no=' + noPendaftaran + '&nama=' + nama
+            })
+            .then(res => res.json())
+            .then(data => {
+                showResult(data);
+            })
+            .catch(() => {
+                showResult({
+                    status: 'tidak-ditemukan',
+                    pesan: 'Terjadi kesalahan koneksi ke server.'
+                });
+            });
+        });
+
+        cekLagiBtn.addEventListener('click', resetForm);
+
+        function showLoading() {
+            cekCard.style.display = 'none';
+            resultContainer.style.display = 'block';
+            statusIcon.innerHTML = '';
+            statusTitle.textContent = 'Memproses...';
+            statusDetail.textContent = 'Menghubungkan ke database server';
+            spinner.style.display = 'block';
+            cekLagiBtn.style.display = 'none';
+        }
+
+        function showResult(data) {
+            spinner.style.display = 'none';
+            cekLagiBtn.style.display = 'block';
+            
+            if (data.status === 'lolos') {
+                resultContainer.className = 'form-container status-result status-lolos';
+                statusIcon.innerHTML = '<i class="fas fa-trophy" style="color: #22c55e;"></i>';
+                statusTitle.textContent = 'SELAMAT! ANDA LOLOS';
+                statusDetail.innerHTML = `
+                    <span style="font-weight:bold; color:#a855f7;">${data.nama}</span><br>
+                    Program Studi: ${data.prodi}<br>
+                    ${data.universitas}
+                `;
+            } else if (data.status === 'tidak-lolos') {
+                resultContainer.className = 'form-container status-result status-tidak-lolos';
+                statusIcon.innerHTML = '<i class="fas fa-heart-broken" style="color: #ef4444;"></i>';
+                statusTitle.textContent = 'TETAP SEMANGAT';
+                statusDetail.innerHTML = `Maaf <b>${data.nama}</b>,<br>Anda belum berhasil pada seleksi kali ini.`;
+            } else {
+                resultContainer.className = 'form-container status-result';
+                statusIcon.innerHTML = '<i class="fas fa-question-circle"></i>';
+                statusTitle.textContent = 'TIDAK DITEMUKAN';
+                statusDetail.textContent = data.pesan;
+            }
+        }
+
+        function resetForm() {
+            resultContainer.style.display = 'none';
+            cekCard.style.display = 'block';
+            noPendaftaranInput.value = '';
+            namaInput.value = '';
+        }
+    </script>
+</body>
+</html>
